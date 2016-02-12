@@ -12,21 +12,26 @@ npm i -S reasync
 
 The package is under hard development. Don't use in production.
 
-## How does it work?
+##API
 
-On server, we use `renderProps` from react-router match callback. We iterate
-over components, looking after components decorated with `asyncResolve`
+### `resolveOnClient(history, routes, custom)`
 
-On client we use `AsyncResolver` component in react-router render, where we
-bind to componentWillMount to check data after startup and then componentWillReceiveProps
-to check for route changing
+Used for resolving on client. after execution of this function package hook itself to history
+and start listening for route changes.
 
-For executing actions before rendering we use `history.listenBefore()`
+### `resolveOnServer(renderProps, custom)`
 
-We don't do any optimisations, as we can do that on connected component, which receive
-in decorated function all it needs, like location, params and all our params we define
+Resolving on the server is handled after match of react-router package. Funcion itterate over all components,
+find decorated ones and execute their actions
 
-#Example
+### `asyncProps(preResolve, deferResolve)`
+
+HOC for adding pre and defer actions to components. Every parameter must be function or false value.
+ If function provided, first argument is named and contain `params`, `location` and everything defined in custom.
+ Return value of this function must be promise.
+
+
+##Example
 
 ### On client
 
@@ -40,7 +45,7 @@ import reducers from './redux/modules';
 import {getRoutes} from './routes';
 import {Provider} from 'react-redux';
 import {Router, browserHistory } from 'react-router';
-import {AsyncResolver, connectHistoryForResolving} from 'reasync';
+import {resolveOnClient} from 'reasync';
 import {syncHistoryWithStore} from 'react-router-redux'
 
 const store = createStore(browserHistory, window.__data__);
@@ -54,19 +59,11 @@ const custom = {
     getState:store.getState
 };
 
-connectHistoryForResolving(history, routes, custom);
-const router = (
-  <Router
-      history={history}
-      routes={routes}
-      render={(props) => <AsyncResolver custom={custom} {...props}/>}
-  />
-);
-
+resolveOnClient(history, routes, custom);
 
 ReactDOM.render(
 <Provider store={store} key="provider">
-  {router}
+  <Router history={history} routes={routes} />
 </Provider>,
 mountPoint
 );
@@ -81,7 +78,7 @@ mountPoint
 ... //import createStore, getRoutes, reducers etc.
 import {match} from 'react-router';
 import createHistory from 'history/lib/createMemoryHistory';
-import {getAsyncDependencies} from 'reasync';
+import {resolveOnServer} from 'reasync';
 
 match({history,routes,location:req.originalUrl},(error, redirectLocation, renderProps) => {
   if (redirectLocation) {
@@ -91,19 +88,10 @@ match({history,routes,location:req.originalUrl},(error, redirectLocation, render
     res.status(500);
     hydrateOnClient(); // error in router, you should try to hydrate app on client
   } else if(renderProps) {
-
-      //here starts our work, we get all connected promises and after they are resolved, we render app for client
-      const resolveParams = [renderProps.location, renderProps.params, custom];
-      const preAsyncDependencies = getAsyncDependencies(renderProps.components);
-      const deferAsyncDependencies = getAsyncDependencies(renderProps.components,false);
-        Promise.all(preAsyncDependencies(...resolveParams))
-          .then(() => Promise.all(deferAsyncDependencies(...resolveParams)))
-          .then(
-            //render ...
-          ).catch((e) => {
-            console.error(e);
-            hydrateOnClient();
-          });
+    resolveOnServer(renderProps,custom).then(
+      () => {}, //render...
+      (e) => {console.log(e)} //error, hydrate on client
+    )
   } else {
     console.error(err);
     res.status(404);  // page not found in router, you should try to hydrate app on client
@@ -136,7 +124,7 @@ const deferResolve = ({getState,dispatch}) => {
   return Promise.all(promises);
 }
 
-//if you need only deferRespolve, preResolve should be undefined or any other false value
+//if you need only deferResolve, preResolve should be undefined or any other false value
 @asyncResolve(preResolve, deferResolve)
 export default class App extends Component {
 ...
