@@ -14,12 +14,28 @@ The package is under hard development. Don't use in production.
 
 ##API
 
-### `resolveOnClient(history, routes, custom)`
+### `resolveOnClient(history, routes, custom):Resolver`
 
 Used for resolving on client. after execution of this function package hook itself to history
-and start listening for route changes.
+and start listening for route changes. Resolver object returned has four methods.
 
-### `resolveOnServer(renderProps, custom)`
+#### `beforeTransition(callback)`
+
+actions to be executed before transition and preResolving
+
+#### `afterTransition(callback)`
+
+actions to be executed after transition and before deferResolving
+
+#### `setTransitionRule((oldLocation,newLocation) => {})`
+
+rule when transition should trigger resolving
+
+#### `stopResolving()`
+
+unregister listeBefore hook from history
+
+### `resolveOnServer(renderProps, custom):Promise`
 
 Resolving on the server is handled after match of react-router package. Funcion itterate over all components,
 find decorated ones and execute their actions
