@@ -11,21 +11,19 @@ export const resolveOnClient = (history, routes, custom) => {
 
   let transitonRule = (oldLoc, newLoc) => oldLoc.pathname != newLoc.pathname || oldLoc.search != newLoc.search;
 
-  function beforeTransition(callback) {
+  const beforeTransition = callback => {
     if(beforeTransitionHooks.indexOf(callback) === -1) {
       beforeTransitionHooks.push(callback);
     }
   }
 
-  function afterTransition(callback) {
+  const afterTransition = callback => {
     if(afterTransitionHooks.indexOf(callback) === -1) {
       afterTransitionHooks.push(callback);
     }
   }
 
-  function setTransitionRule(rule) {
-    transitonRule = rule;
-  }
+  const setTransitionRule = rule => transitonRule = rule;
 
   const executeBeforeTransition = (location,params,custom) => {
     beforeTransitionHooks.forEach((callback) => callback({location,params,...custom}));
