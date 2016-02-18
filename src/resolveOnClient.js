@@ -2,7 +2,7 @@ import {ReactRouter, match} from 'react-router';
 import {getPreResolveDependencies,getDeferResolveDependencies} from './helpers'
 import {createLocationStorage} from './locationStorage';
 
-export const resolveOnClient = (history, routes, custom) => {
+export const resolveOnClient = (history, routes, {getState,dispatch}, custom = {}) => {
 
   const beforeTransitionHooks = [];
   const afterTransitionHooks = [];
@@ -12,44 +12,43 @@ export const resolveOnClient = (history, routes, custom) => {
   let transitonRule = (oldLoc, newLoc) => oldLoc.pathname != newLoc.pathname || oldLoc.search != newLoc.search;
 
   const beforeTransition = callback => {
-    if(beforeTransitionHooks.indexOf(callback) === -1) {
+    if (beforeTransitionHooks.indexOf(callback) === -1) {
       beforeTransitionHooks.push(callback);
     }
   }
 
   const afterTransition = callback => {
-    if(afterTransitionHooks.indexOf(callback) === -1) {
+    if (afterTransitionHooks.indexOf(callback) === -1) {
       afterTransitionHooks.push(callback);
     }
   }
 
   const setTransitionRule = rule => transitonRule = rule;
 
-  const executeBeforeTransition = (location,params,custom) => {
-    beforeTransitionHooks.forEach((callback) => callback({location,params,...custom}));
+  const executeBeforeTransition = (attrs) => {
+    beforeTransitionHooks.forEach((callback) => callback(attrs));
   }
 
-  const executeAfterTransition = (location,params,custom) => {
-    afterTransitionHooks.forEach((callback) => callback({location,params,...custom}));
+  const executeAfterTransition = (attrs) => {
+    afterTransitionHooks.forEach((callback) => callback(attrs));
   }
 
   const stopResolving = history.listenBefore((location, continueTransition) => {
     let lastLocation = locationStorage.getLastLocation();
     locationStorage.setNewLocation(location);
-    if(!transitonRule(lastLocation,location)) return;
+    if (!transitonRule(lastLocation, location)) return;
 
     match({history, location, routes}, (error, redirectLocation, renderProps) => {
       if (redirectLocation) {
         history.transitionTo(redirectLocation);
-      } else if(renderProps) {
+      } else if (renderProps) {
         const {components,params} = renderProps;
-        const attrs = [location,params,custom];
-
-        executeBeforeTransition();
-        Promise.all(getPreResolveDependencies(components)(...attrs))
-          .then(continueTransition,continueTransition)
-          .then(executeAfterTransition,executeAfterTransition)
-          .then(getDeferResolveDependencies(components)(...attrs))
+        const attrs = {...custom, location, params, getState, dispatch};
+        executeBeforeTransition(attrs);
+        Promise.all(getPreResolveDependencies(components)(attrs))
+          .then(continueTransition, continueTransition)
+          .then(executeAfterTransition.bind(undefined, attrs), executeAfterTransition.bind(undefined, attrs))
+          .then(getDeferResolveDependencies(components)(attrs))
       }
     });
   });

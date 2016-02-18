@@ -10,11 +10,11 @@ npm i -S reasync
 
 ##Warning
 
-The package is under hard development. Don't use in production.
+The package is currently alfa version. Use with own risk.
 
 ##API
 
-### `resolveOnClient(history, routes, custom:Object):Resolver`
+### `resolveOnClient(history, routes, store:ReduxStore, custom?:Object):Resolver`
 
 Used for resolving on client. after execution of this function package hook itself to history
 and start listening for route changes. Resolver object returned has four methods.
@@ -35,7 +35,7 @@ rule when transition should trigger resolving
 
 unregister listeBefore hook from history
 
-### `resolveOnServer(renderProps, custom:Object):Promise`
+### `resolveOnServer(renderProps, store:ReduxStore, custom?:Object):Promise`
 
 Resolving on the server is handled after match of react-router package. Funcion itterate over all components,
 find decorated ones and execute their actions
@@ -70,12 +70,7 @@ const routes = getRoutes(store);
 
 const mountPoint = document.getElementById('content');
 
-const custom = {
-    dispatch:store.dispatch,
-    getState:store.getState
-};
-
-resolveOnClient(history, routes, custom);
+resolveOnClient(history, routes, store);
 
 ReactDOM.render(
 <Provider store={store} key="provider">
@@ -104,7 +99,7 @@ match({history,routes,location:req.originalUrl},(error, redirectLocation, render
     res.status(500);
     hydrateOnClient(); // error in router, you should try to hydrate app on client
   } else if(renderProps) {
-    resolveOnServer(renderProps,custom).then(
+    resolveOnServer(renderProps,store).then(
       () => {}, //render...
       (e) => {console.log(e)} //error, hydrate on client
     )
@@ -129,7 +124,7 @@ it is resolved before rendering, but on client it is resolved after route transi
 ```javascript
 import asyncResolve from 'reasync';
 
-// first argument is named, containing location and params from router, and every custom functionality injected
+// first argument is named, containing `location` and `params` from router, `getState` and `dispatch` from store and every custom functionality injected
 const preResolve = () => new Promise(resolve => setTimeout(resolve,2000)); // all route transition will happended with 2sec delay
 
 const deferResolve = ({getState,dispatch}) => {
