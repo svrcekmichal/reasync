@@ -154,6 +154,14 @@ You can use same as above, only don't export class, but result of `asyncData`
 
 [svrcekmichal/universal-react](https://github.com/svrcekmichal/universal-react)
 
+## Related projects
+
+- [React Resolver](https://github.com/ericclemmons/react-resolver) by [@ericclemmons](https://twitter.com/ericclemmons)
+- [React Transmit](https://github.com/RickWong/react-transmit) by [@rygu](https://twitter.com/rygu)
+- [AsyncProps for React Router](https://github.com/rackt/async-props) by [@ryanflorence](https://twitter.com/ryanflorence)
+- [React Async](https://github.com/andreypopp/react-async) by [@andreypopp](https://twitter.com/andreypopp)
+- [Redial](https://github.com/markdalgleish/redial) by [@markdalgleish](https://twitter.com/markdalgleish)
+
 ## Future
 
 There's so much to do, like write tests, simplify usage, cleanup the mess
