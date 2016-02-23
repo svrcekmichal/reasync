@@ -1,16 +1,11 @@
-import React,{Component} from 'react';
+import React, { Component } from 'react';
 
-export const asyncResolve = (preResolve, deferResolve) => {
-  return WrappedComponent => {
-    class AsyncResolve extends Component {
+export const asyncResolve = (preResolve, deferResolve) => WrappedComponent => class AsyncResolve extends Component {
 
-      static preResolve = preResolve;
-      static deferResolve = deferResolve;
+  static preResolve = preResolve;
+  static deferResolve = deferResolve;
 
-      render() {
-        return (<WrappedComponent {...this.props} />)
-      }
-    }
-    return AsyncResolve;
+  render() {
+    return (<WrappedComponent {...this.props} />);
   }
-}
+};

@@ -18,6 +18,5 @@ export const createLocationStorage = () => {
   return {
     setNewLocation,
     getLastLocation
-  }
-
-}
+  };
+};
