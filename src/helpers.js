@@ -1,10 +1,11 @@
-const getDependencies = (components, preResolve = true) => (attrs) => {
-  const resolveType = preResolve ? 'preResolve' : 'deferResolve';
-  return components
-    .filter(component => component && component[resolveType])
-    .map(component => component[resolveType])
-    .map(resolve => resolve(attrs));
+const getDependencies = (components, type) => (attrs) => {
+  const toResolve = components
+    .filter(component => component && component.asyncResolve && component.asyncResolve[type])
+    .map(component => component.asyncResolve[type]);
+
+  const flattened = [].concat.apply([], toResolve);
+  return flattened.map(resolve => resolve(attrs));
 };
 
-export const getPreResolveDependencies = (components) => getDependencies(components, true);
-export const getDeferResolveDependencies = (components) => getDependencies(components, false);
+export const getPreResolveDependencies = (components) => getDependencies(components, 'preResolve');
+export const getDeferResolveDependencies = (components) => getDependencies(components, 'deferResolve');
