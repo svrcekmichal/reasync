@@ -9,7 +9,3 @@ dependencies:
     - node_modules
   override:
     - npm prune && npm install
-
-test:
-  override:
-    - npm run lint

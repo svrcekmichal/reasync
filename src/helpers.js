@@ -3,7 +3,7 @@ const getDependencies = (components, preResolve = true) => (attrs) => {
   return components
     .filter(component => component && component[resolveType])
     .map(component => component[resolveType])
-    .map(fetchData => fetchData(attrs));
+    .map(resolve => resolve(attrs));
 };
 
 export const getPreResolveDependencies = (components) => getDependencies(components, true);
