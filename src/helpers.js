@@ -2,9 +2,9 @@ const getDependencies = (components, type) => (attrs) => {
   const toResolve = components
     .filter(component => component && component.asyncResolve && component.asyncResolve[type])
     .map(component => component.asyncResolve[type]);
-
-  const flattened = [].concat.apply([], toResolve);
-  return flattened.map(resolve => resolve(attrs));
+  return [].concat.apply([], toResolve)
+    .filter(resolve => resolve) // only to support asyncResolve, will be removed in future
+    .map(resolve => resolve(attrs));
 };
 
 export const getPreResolveDependencies = (components) => getDependencies(components, 'preResolve');
