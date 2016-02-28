@@ -10,14 +10,14 @@ npm i -S reasync
 
 ##Warning
 
-The package is currently alfa version. Use with own risk.
+The package is currently alpha version. Use with own risk.
 
 ##API
 
 ### `resolveOnClient(history, routes, store:ReduxStore, custom?:Object):Resolver`
 
 Used for resolving on client. after execution of this function package hook itself to history
-and start listening for route changes. Resolver object returned has four methods.
+and start listening for route changes. Resolver object returned has four methods:
 
 #### `Resolver.beforeTransition(callback:Function)`
 
@@ -37,15 +37,31 @@ unregister listeBefore hook from history
 
 ### `resolveOnServer(renderProps, store:ReduxStore, custom?:Object):Promise`
 
-Resolving on the server is handled after match of react-router package. Funcion itterate over all components,
+Resolving on the server is handled after match of react-router package. Function iterate over all components,
 find decorated ones and execute their actions
 
-### `asyncProps(preResolve, deferResolve)`
+### `preResolve(resolveFunction)`
+### `pre(resolveFunction) => alias for preResolve`
+### `deferResolve(resolveFunction)`
+### `defer(resolveFunction) => alias for deferResolve`
 
-HOC for adding pre and defer actions to components. Every parameter must be function or false value.
- If function provided, first argument is named and contain `params`, `location` and everything defined in custom.
- Return value of this function must be promise.
+HOC for adding resolve actions to components. Accepts `resolveFunction` with following signature: `Function(attrs):Promise`.
+ First argument is named and contain `params`, `location`, `store`, `getState` and every named value defined in custom.
+ Return value of this function must be Promise.
 
+### `asyncResolve(preResolve,deferResolve)`
+
+Implementation of `preResolve` followed by `deferResolve`
+
+### `resolve(name,toResolve):` 
+
+Every defined resolve before is only shortcut for resolve. For example `preResolve = resolve.bind(undefined,'preResolve');`.
+That's all, no magic. Resolve is exported for custom resolves, which will be used in next versions.
+
+### `DEPRECATED asyncResolve(pre,defer)`
+
+Special implementation of resolve, which can add preResolve and deferResolve in one decoration. `asyncResolve` is deprecated and will be
+removed in next version. If you need it and want it, you can create it yourself or send me PM.
 
 ##Example
 
@@ -114,17 +130,25 @@ match({history,routes,location:req.originalUrl},(error, redirectLocation, render
 
 ### Component decorator
 
-For decorating component you can use default export. Decorator must contain function, which return promise.
-Decorator can accept two function which return promise. First parameter is for prefetching, before route
-transition, second one is for deferred fething.
+Use one of available decorators or create own:
+```javascript
+import asyncResolve from 'reasync'; //deprecated
 
-From my point of view, people don't understand word 'deferred' same way, so in this package, on the server
-it is resolved before rendering, but on client it is resolved after route transition
+import {preResolve} from 'reasync';
+import {pre} from 'reasync';
+import {deferResolve} from 'reasync';
+import {defer} from 'reasync';
+
+//custom resolver
+import {resolve} from 'reasync'
+const customResolve = resolve.bind(undefined,'customResolve');
+```
+
+And use for decorating of component
 
 ```javascript
-import asyncResolve from 'reasync';
+import {pre,defer} from 'reasync';
 
-// first argument is named, containing `location` and `params` from router, `getState` and `dispatch` from store and every custom functionality injected
 const preResolve = () => new Promise(resolve => setTimeout(resolve,2000)); // all route transition will happended with 2sec delay
 
 const deferResolve = ({getState,dispatch}) => {
@@ -135,8 +159,8 @@ const deferResolve = ({getState,dispatch}) => {
   return Promise.all(promises);
 }
 
-//if you need only deferResolve, preResolve should be undefined or any other false value
-@asyncResolve(preResolve, deferResolve)
+@pre(preResolve)
+@defer(deferResolve)
 export default class App extends Component {
 ...
 
@@ -144,9 +168,9 @@ export default class App extends Component {
 
 #### Don't want to use decorators?
 
-You can use same as above, only don't export class, but result of `asyncData`
+You can use same as above, only don't export class, but result of function
 ```javascript
-  export default asyncResolve(preResolve, deferResolve)(App); //exported component
+  export default pre(preResolve)(App); //exported component
 ```
 
 

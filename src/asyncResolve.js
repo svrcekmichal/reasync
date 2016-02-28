@@ -1,11 +1,34 @@
 import React, { Component } from 'react';
 
-export const asyncResolve = (preResolve, deferResolve) => WrappedComponent => class AsyncResolve extends Component {
+export const resolve = (name, toResolve) => WrappedComponent => {
+  let component;
+  if (typeof WrappedComponent.asyncResolve === 'undefined') {
+    component = class AsyncResolve extends Component {
+      static asyncResolve = Object.create(null);
 
-  static preResolve = preResolve;
-  static deferResolve = deferResolve;
-
-  render() {
-    return (<WrappedComponent {...this.props} />);
+      render() {
+        return <WrappedComponent {...this.props} />;
+      }
+    };
+  } else {
+    component = WrappedComponent;
   }
+
+  if (typeof component.asyncResolve[name] === 'undefined') {
+    component.asyncResolve[name] = [];
+  }
+
+  component.asyncResolve[name].push(toResolve);
+  return component;
 };
+
+export const preResolve = resolve.bind(undefined, 'preResolve');
+
+export const deferResolve = resolve.bind(undefined, 'deferResolve');
+
+/**
+ * @deprecated
+ * @param pre
+ * @param defer
+ */
+export const asyncResolve = (pre, defer) => component => deferResolve(defer)(preResolve(pre)(component));
