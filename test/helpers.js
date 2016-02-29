@@ -1,88 +1,75 @@
 import {expect} from 'chai';
-import {asyncResolve} from '../src/asyncResolve';
-import {getPreResolveDependencies,getDeferResolveDependencies} from '../src/helpers';
+import {resolve} from '../src/resolve';
+import {getDependencies, isFunction, isString } from '../src/helpers';
 
 describe('helpers', () => {
 
-  const componentA = (props) => (<div></div>);
-
-  describe('getPreResolveDependencies', () => {
+  describe('getDependencies', () => {
 
     it('should receive passed attributes', () => {
       const availableAttributes = 'attributes';
-      let receivedAttributes;
+      let receivedAttributes = undefined;
 
-      const pre = (attributes) => receivedAttributes = attributes;
+      const pre = (attributes) => {
+        receivedAttributes = attributes;
+      };
 
-      const components = [asyncResolve(pre)(componentA)];
-      getPreResolveDependencies(components)(availableAttributes);
+      const components = [resolve('hookName', pre)({})];
+      getDependencies(components, 'hookName', availableAttributes);
       expect(availableAttributes).to.equal(receivedAttributes);
     });
 
-    it('should handle only preResolve', () => {
+    it('should return only wanted resolve', () => {
 
-      let handledPre = false;
-      let handledDefer = false;
+      let hook1Called = false;
+      let hook2Called = false;
 
-      const pre = (attributes) => handledPre = true;
-      const defer = (attributes) => handledDefer = true;
-      const components = [asyncResolve(pre,defer)(componentA)];
+      const hook1 = (attributes) => hook1Called = true;
+      const hook2 = (attributes) => hook2Called = true;
+      const hooked1 = resolve('hook1', hook1)({});
+      const hookedAll = resolve('hook2', hook2)(hooked1);
 
-      getPreResolveDependencies(components)(null);
+      getDependencies([hookedAll], 'hook1', {});
 
-      expect(handledPre).to.be.ok;
-      expect(handledDefer).to.not.be.ok;
+      expect(hook1Called).to.be.ok;
+      expect(hook2Called).to.not.be.ok;
     });
 
   });
 
-  describe('getDeferResolveDependencies', () => {
+  describe('typeHelpers', () => {
 
-    it('should receive passed attributes', () => {
-      const availableAttributes = 'attributes';
-      let receivedAttributes;
+    const bool = true;
+    const num = 23;
+    const str = 'abc';
+    const undef = undefined;
+    const typeNull = null;
+    const arr = [];
+    const obj = {};
+    const func = () => {};
 
-      const defer = (attributes) => receivedAttributes = attributes;
+    it('expect isString to detect only string', () => {
+      expect(isString(bool)).to.not.be.ok;
+      expect(isString(num)).to.not.be.ok;
+      expect(isString(str)).to.be.ok;
+      expect(isString(undef)).to.not.be.ok;
+      expect(isString(typeNull)).to.not.be.ok;
+      expect(isString(arr)).to.not.be.ok;
+      expect(isString(obj)).to.not.be.ok;
+      expect(isString(func)).to.not.be.ok;
 
-      const components = [asyncResolve(undefined, defer)(componentA)];
-      getDeferResolveDependencies(components)(availableAttributes);
-      expect(availableAttributes).to.equal(receivedAttributes);
     });
 
-    it('should handle only deferResolve', () => {
-
-      let handledPre = false;
-      let handledDefer = false;
-
-      const pre = (attributes) => handledPre = true;
-      const defer = (attributes) => handledDefer = true;
-      const components = [asyncResolve(pre,defer)(componentA)];
-
-      getDeferResolveDependencies(components)(null);
-
-      expect(handledPre).to.not.be.ok;
-      expect(handledDefer).to.be.ok;
+    it('expect isFunction to detect only string', () => {
+      expect(isFunction(bool)).to.not.be.ok;
+      expect(isFunction(num)).to.not.be.ok;
+      expect(isFunction(str)).to.not.be.ok;
+      expect(isFunction(undef)).to.not.be.ok;
+      expect(isFunction(typeNull)).to.not.be.ok;
+      expect(isFunction(arr)).to.not.be.ok;
+      expect(isFunction(obj)).to.not.be.ok;
+      expect(isFunction(func)).to.be.ok;
     });
-
   });
-
-  describe('resolveDependencies', () => {
-
-    it('should handle both resolve', () => {
-
-      let handledPre = false;
-      let handledDefer = false;
-
-      const pre = (attributes) => handledPre = true;
-      const defer = (attributes) => handledDefer = true;
-      const components = [asyncResolve(pre,defer)(componentA)];
-
-      getPreResolveDependencies(components)(null);
-      getDeferResolveDependencies(components)(null);
-
-      expect(handledPre).to.be.ok;
-      expect(handledDefer).to.be.ok;
-    });
-  })
 
 });

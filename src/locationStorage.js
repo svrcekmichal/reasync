@@ -7,13 +7,11 @@ export const createLocationStorage = () => {
     action: undefined,
   };
 
-  function setNewLocation(location) {
+  const setNewLocation = location => {
     lastLocation = location;
-  }
+  };
 
-  function getLastLocation() {
-    return lastLocation;
-  }
+  const getLastLocation = () => lastLocation;
 
   return {
     setNewLocation,
