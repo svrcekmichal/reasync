@@ -47,11 +47,10 @@ export const resolveOnClient = (history, routes, { getState, dispatch }, custom 
         const { components, params } = renderProps;
         const attrs = { ...custom, location, params, getState, dispatch };
         executeBeforeTransition(attrs);
-        const deferResolve = () => Promise.all(getDeferResolveDependencies(components)(attrs));
         Promise.all(getPreResolveDependencies(components)(attrs))
           .then(continueTransition, continueTransition)
           .then(executeAfterTransition.bind(undefined, attrs), executeAfterTransition.bind(undefined, attrs))
-          .then(deferResolve, deferResolve);
+          .then(() => Promise.all(getDeferResolveDependencies(components)(attrs)));
       }
     });
   });

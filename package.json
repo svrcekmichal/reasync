@@ -1,6 +1,6 @@
 {
   "name": "reasync",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Library for connecting react components to async actions like fetching",
   "main": "lib/index.js",
   "scripts": {

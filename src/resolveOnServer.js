@@ -2,7 +2,6 @@ import { getPreResolveDependencies, getDeferResolveDependencies } from './helper
 
 export const resolveOnServer = ({ location, params, components }, { getState, dispatch }, custom = {}) => {
   const attrs = { ...custom, location, params, getState, dispatch };
-  const deferResolve = () => Promise.all(getDeferResolveDependencies(components)(attrs));
   return Promise.all(getPreResolveDependencies(components)(attrs))
-    .then(deferResolve, deferResolve);
+    .then(() => Promise.all(getDeferResolveDependencies(components)(attrs)));
 };
