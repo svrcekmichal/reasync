@@ -16,7 +16,7 @@ location, params, components and all custom attributes defined in `createResolve
 
 ```javascript
 import { resolve } from 'reasync';
-import { Component } from 'react'
+import { Component } from 'react';
 
 const toResolve = ({location, analytics}) => analytics.push(location);
 

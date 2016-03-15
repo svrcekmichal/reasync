@@ -38,7 +38,7 @@ export const createClientResolver = (history, routes, custom = {}) => {
   };
 
   const addHooks = (...hooks) => {
-    resolver.addHooks(hooks);
+    resolver.addHooks(...hooks);
     return { addHooks, setErrorHandler };
   };
 
