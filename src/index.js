@@ -1,12 +1,23 @@
 export {
-  asyncResolve as default,
+  PRE_RESOLVE_HOOK,
+  DEFER_RESOLVE_HOOK,
   preResolve,
   preResolve as pre,
   deferResolve,
   deferResolve as defer,
   resolve
-} from './asyncResolve';
+} from './resolve';
 
-export { resolveOnClient } from './resolveOnClient';
+export {
+  createResolver
+} from './createResolver';
 
-export { resolveOnServer } from './resolveOnServer';
+export {
+  createClientResolver
+} from './createClientResolver';
+
+export {
+  createGlobalHook,
+  createLocalHook,
+  createTransitionHook
+} from './createHooks';

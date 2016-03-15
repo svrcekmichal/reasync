@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 
+export const PRE_RESOLVE_HOOK = 'preResolveHook';
+export const DEFER_RESOLVE_HOOK = 'deferResolveHook';
+
 export const resolve = (name, toResolve) => WrappedComponent => {
   let component;
   if (typeof WrappedComponent.asyncResolve === 'undefined') {
@@ -22,13 +25,6 @@ export const resolve = (name, toResolve) => WrappedComponent => {
   return component;
 };
 
-export const preResolve = resolve.bind(undefined, 'preResolve');
+export const preResolve = resolve.bind(undefined, PRE_RESOLVE_HOOK);
 
-export const deferResolve = resolve.bind(undefined, 'deferResolve');
-
-/**
- * @deprecated
- * @param pre
- * @param defer
- */
-export const asyncResolve = (pre, defer) => component => deferResolve(defer)(preResolve(pre)(component));
+export const deferResolve = resolve.bind(undefined, DEFER_RESOLVE_HOOK);

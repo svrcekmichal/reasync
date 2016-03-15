@@ -2,14 +2,28 @@
 
 Library for connecting React components to async actions like fetching
 
-#### Docs
-
-- [Installation & Usage](https://github.com/svrcekmichal/reasync/blob/master/docs/USAGE.md)
-- [Api](https://github.com/svrcekmichal/reasync/blob/master/docs/API.md)
-
 ##Warning
 
-The package is currently alpha version. Use with own risk.
+The package is currently in beta version. Use with own risk. It's used in production on own closed-source app.
+
+#### Docs
+
+- [Installation & Simple Example](https://github.com/svrcekmichal/reasync/blob/master/docs/SIMPLE_EXAMPLE.md)
+- [Complex Example](https://github.com/svrcekmichal/reasync/blob/master/docs/COMPLEX_EXAMPLE.md)
+- [API](https://github.com/svrcekmichal/reasync/blob/master/docs/API.md)
+
+## Why I need this?
+
+Let's say we have universal application. We want to fetch some data on server, before server render. 
+We also want to do some work only on server, before render and we want to track server action to let's say 
+google analytics after render. 
+
+On the client, we hydrate app with data from server, but if server fail we want to fetch data from client. 
+After data are fetched we want to start rendering, then fetch some data after render, you want do some action 
+only on client and when everything is done we want to track some actions to analytics too. We want to track 
+actions even if something before failed. We want to show user some loader before transition is done.
+
+You can configure lifecycle of this events with `reasync`.
 
 ## Why I have created this package?
 
@@ -17,34 +31,12 @@ Long time ago, few people started using react-redux project for managing routing
 and deferred fetching was used making router transition from one route to another more sophisticated. React-redux package was awesome,
 but it stared to get bloated and handling to much and it was also complicated to setup.
 
-People started to migrate to react-router-redux, which was much more simplified, but it was not possible to easily create react-redux functionality in transition. 
-I found it awesome to be able to delay transition, when i want and to fetch data or do any other async work when i want.
+People started to migrate to react-router-redux, which was much more simplified, but it was not possible to easily create react-redux transition functionality. 
+I found it awesome to be able to delay transition and to fetch data or do any other async work when i want to.
 
-This package is not about how to fetch data, query some storage or another async actions. It's about way to tell, when i need those data. Do I need those data
-before server start to render? Do I need them before some page is shown to client? And what should be done before transition, what after? 
-
-## What does it do?
-
-This is lifecycle of single transition in reasync, which better ilustrate what does it do:
-
-### On server
-
-1. `user` visit url
-2. `react-router` match route to url and return list of components
-3. `reasync` check all `preResolve` actions defined on components
-4. when `preResolve` is done, it will do all `deferResolve` actions defined on components
-5. from this point your `server` continue, you can do what ever you want, for example `render` to client
-
-### On client
-
-1. `user` click on link and initialize transition
-2. `react-router` match route to url and return list of components
-3. `reasync` triggers everything defined in `beforeTransition`, for example start showing loader
-4. `reasync` check all `preResolve` actions defined on components and resolve them
-until now `user` can see old page, maybe change where he want to navigate, or read another article, see advertisement etc
-5. `react-router` will transition to new page
-6. `reasync` triggers everything defined in `afterTransition`, for example stop showing loader
-7. `reasync` check all `deferResolve` actions defined on components and resolve them
+This package is not about how to fetch data, query some storage or another async actions. It's about way to tell, when i need to execute that async action. 
+Do I need some data before server start to render? Do I need to track something only on server? Or load some storage only on client?  Do I need them before 
+page is shown to client? And what should be done before transition, what after? 
 
 ## Used in
 
