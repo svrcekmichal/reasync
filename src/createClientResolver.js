@@ -2,9 +2,10 @@ import { match } from 'react-router';
 import { createLocationStorage } from './locationStorage';
 import { createResolver } from './createResolver';
 
-export const createClientResolver = (history, routes, custom = {}) => {
+export const createClientResolver = (history, routes, initLocation, custom = {}) => {
   const resolver = createResolver();
-  const locationStorage = createLocationStorage();
+
+  const locationStorage = createLocationStorage(initLocation);
 
   let transitionRule = (lastLocation, newLocation) =>
   lastLocation.pathname !== newLocation.pathname ||
@@ -20,7 +21,7 @@ export const createClientResolver = (history, routes, custom = {}) => {
     if (!forced && !isTransition(location)) return;
     match({ history, location, routes }, (error, redirectLocation, renderProps) => {
       if (renderProps) {
-        const attrs = { ...custom, location, params: renderProps.params };
+        const attrs = { ...custom };
         resolver.triggerHooks(renderProps.components, attrs, () => {
           continueTransition();
           locationStorage.setNewLocation(location);

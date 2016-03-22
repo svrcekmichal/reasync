@@ -1,6 +1,6 @@
 {
   "name": "reasync",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "description": "Library for connecting react components to async actions like fetching",
   "main": "lib/index.js",
   "scripts": {
@@ -37,6 +37,6 @@
   },
   "dependencies": {
     "react": "^0.14.7",
-    "react-router": "^2.0.0-rc6"
+    "react-router": "^2.0.0"
   }
 }

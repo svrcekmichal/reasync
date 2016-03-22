@@ -1,5 +1,5 @@
-export const createLocationStorage = () => {
-  let lastLocation = {
+export const createLocationStorage = (location = undefined) => {
+  let lastLocation = location || {
     pathname: undefined,
     search: undefined,
     query: undefined,
@@ -7,8 +7,8 @@ export const createLocationStorage = () => {
     action: undefined,
   };
 
-  const setNewLocation = location => {
-    lastLocation = location;
+  const setNewLocation = newlocation => {
+    lastLocation = newlocation;
   };
 
   const getLastLocation = () => lastLocation;
