@@ -21,7 +21,7 @@ export const createClientResolver = (history, routes, initLocation, custom = {})
     if (!forced && !isTransition(location)) return;
     match({ history, location, routes }, (error, redirectLocation, renderProps) => {
       if (renderProps) {
-        const attrs = { ...custom };
+        const attrs = { ...custom, location: renderProps.location, params: renderProps.params };
         resolver.triggerHooks(renderProps.components, attrs, () => {
           continueTransition();
           locationStorage.setNewLocation(location);
