@@ -35,6 +35,30 @@ describe('helpers', () => {
       expect(hook2Called).to.not.be.ok;
     });
 
+    it('should resolve getComponents/components object map', () => {
+
+      let hook1Count = 0;
+      let hook2Count = 0;
+
+      const hook1 = (attributes) => hook1Count++;
+      const hook2 = (attributes) => hook2Count++;
+
+      const hooked = [
+        resolve('hook1', hook1)({}),
+        {
+          contentA: resolve('hook1', hook1)({}),
+          contentB: resolve('hook2', hook2)({})
+        }
+      ];
+
+      getDependencies(hooked, 'hook1', {});
+
+      expect(hook1Count).to.equal(2);
+      expect(hook2Count).to.equal(0);
+
+    })
+
+
   });
 
   describe('typeHelpers', () => {
