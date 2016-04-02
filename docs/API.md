@@ -105,7 +105,7 @@ We recommend to insert `location`, `params` from renderProps. If you are using `
 
 Only single notice, make sure that attributes inserted to all resolver are same. Client resolver is inserting `location` and `params` in it's implementation.
  
-## createClientResolver(history:History, routes: Routes, attributes:Object):ClientResolver
+## createClientResolver(history:History, routes: Routes, initLocation:Location[, attributes:Object]):ClientResolver
 
 Used for creating client resolver object. First attribute must be history object, from `react-router` or dirrectly fro m `history` package. Second attributes are routes used in router
 and third argument is object with you custom attributes. You can read more about attributes in `Resolver.triggerHooks` method. 

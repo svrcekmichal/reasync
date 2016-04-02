@@ -49,8 +49,8 @@ see new page, but if you want to show old page with some error message just remo
 import {createClientResolver as _createClientResolver} from 'reasync';
 
 //bottom of file
-export const createClientResolver = (history, location, customAttributes) => {
-    const resolver = _createClientResolver(history, location, customAttributes);
+export const createClientResolver = (history, location, initLocation, customAttributes) => {
+    const resolver = _createClientResolver(history, location, initLocation, customAttributes);
     resolver
       .addHooks(PRE_RESOLVE_HOOK) //this will fire first
       .addHooks(createTransitionHook({executeIfPreviousFailed:true}),DEFER_RESOLVE_HOOK) //this two will fire after resolve, parallelly
@@ -75,12 +75,16 @@ import { Provider } from 'react-redux';
 import { Router, browserHistory } from 'react-router';
 import { createClientResolver } from './reasync-setup'; //here we import our reasync setup file
 
+const { pathname, search, hash } = window.location;
+const url = `${pathname}${search}${hash}`;
+const location = browserHistory.createLocation(url);
+
 const store = createStore(browserHistory, window.__data__);
 const routes = getRoutes(store);
 const mountPoint = document.getElementById('content');
 
 const attrs = {getState:store.getState, dispatch:store.dispatch};
-const resolver = createClientResolver(history, routes, attrs); //here we hook it to our history and routes
+const resolver = createClientResolver(history, routes, location, attrs); //here we hook it to our history and routes
 if(!window.__data__) { // if on server something failed and we don't have data, we force trigger
   resolver.forceTransition();    
 }
