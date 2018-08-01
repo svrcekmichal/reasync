@@ -1,8 +1,8 @@
-# REASYNC
+# Deprecated - REASYNC
 
 Library for connecting React components to async actions like fetching
 
-##Warning
+## Warning
 
 The package is currently in beta version. Use with own risk. It's used in production on own closed-source app.
 
